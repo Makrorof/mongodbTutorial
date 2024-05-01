@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 )
 
@@ -24,23 +25,69 @@ func New(collection *mongo.Collection) task.TaskRepo {
 
 func (r *Task) Create(ctx context.Context, task *entity.Task) (*entity.Task, error) {
 	//id fix
-	if task.ID.IsZero() {
-		task.ID = primitive.NewObjectID()
-		zap.L().Info("A new ID has been assigned because the task's ID was empty.", zap.String("new_id", task.ID.String()), zap.String("task.text[:30]", tools.StrLimit(task.Text, 30)))
-	}
+	//if task.ID.ID.IsZero() {
+	//	task.ID.ID = primitive.NewObjectID()
+	//	zap.L().Info("A new ID has been assigned because the task's ID was empty.", zap.String("new_id", task.ID.ID.String()), zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
+	//}
 
-	zap.L().Info("Received a request to create a task.", zap.String("task.text[:30]", tools.StrLimit(task.Text, 30)))
+	zap.L().Info("Received a request to create a task.", zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
 
 	result, err := r.collection.InsertOne(ctx, task)
 
 	if err != nil {
-		zap.L().Error("The task creation could not be completed.", zap.Error(err), zap.String("task.text[:30]", tools.StrLimit(task.Text, 30)))
+		zap.L().Error("The task creation could not be completed.", zap.Error(err), zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
 		return nil, err
 	}
 
-	zap.L().Info("The task creation has been completed.", zap.String("id", task.ID.String()), zap.String("insert_id", result.InsertedID.(primitive.ObjectID).String()), zap.String("task.text[:30]", tools.StrLimit(task.Text, 30)))
+	zap.L().Info("The task creation has been completed.", zap.String("id", task.ID.String()), zap.String("insert_id", entity.ParseTaskID(result.InsertedID).String()), zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
 
 	return task, nil
+}
+
+func (r *Task) CreateOrUpdate(ctx context.Context, task *entity.Task) (*entity.Task, bool, error) {
+	//id fix
+	//if task.ID.ID.IsZero() {
+	//	task.ID.ID = primitive.NewObjectID()
+	//	zap.L().Info("A new ID has been assigned because the task's ID was empty.", zap.String("new_id", task.ID.ID.String()), zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
+	//}
+
+	zap.L().Info("Received a request to create a task.", zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
+
+	filter := bson.M{
+		"_id": task.ID,
+	}
+
+	update := bson.D{
+		bson.E{
+			Key: "$set",
+			Value: bson.D{
+				bson.E{
+					Key:   "created_at",
+					Value: task.CreatedAt,
+				}, bson.E{
+					Key:   "updated_at",
+					Value: task.UpdatedAt,
+				},
+				bson.E{
+					Key:   "completed",
+					Value: task.Completed,
+				},
+			},
+		},
+	}
+
+	result, err := r.collection.UpdateOne(ctx, filter, update, options.Update().SetUpsert(true))
+
+	//result, err := r.collection.InsertOne(ctx, task)
+
+	if err != nil {
+		zap.L().Error("The task creation could not be completed.", zap.Error(err), zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
+		return nil, false, err
+	}
+
+	zap.L().Info("The task creation has been completed.", zap.String("id", task.ID.String()), zap.String("insert_id", entity.ParseTaskID(result.UpsertedID).String()), zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
+
+	return task, result.UpsertedCount > 0, nil
 }
 
 func (r *Task) GetsByFilter(ctx context.Context, filter primitive.D) ([]*entity.Task, error) {

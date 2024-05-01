@@ -7,10 +7,12 @@ import (
 
 func ToTask(t *entity.Task) *model.Task {
 	return &model.Task{
-		ID:        t.ID.String(),
+		ID: model.TaskID{
+			//ID:   t.ID.ID.String(),
+			Text: t.ID.Text,
+		},
 		CreatedAt: t.CreatedAt,
 		UpdatedAt: t.UpdatedAt,
-		Text:      t.Text,
 		Completed: t.Completed,
 	}
 }
@@ -20,10 +22,12 @@ func ToTasks(t []*entity.Task) []*model.Task {
 
 	for i := 0; i < len(t); i++ {
 		tasks[i] = &model.Task{
-			ID:        t[i].ID.String(),
+			ID: model.TaskID{
+				//ID:   t[i].ID.ID.String(),
+				Text: t[i].ID.Text,
+			},
 			CreatedAt: t[i].CreatedAt,
 			UpdatedAt: t[i].UpdatedAt,
-			Text:      t[i].Text,
 			Completed: t[i].Completed,
 		}
 	}

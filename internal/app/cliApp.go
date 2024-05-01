@@ -54,10 +54,12 @@ func RunCLI() {
 						return errors.New("cannot add an empty task")
 					}
 
-					data, err := tasksUsecase.Create(context.TODO(), str)
+					data, created, err := tasksUsecase.Create(context.TODO(), str)
 
-					if err == nil {
-						fmt.Println("OK. ID: ", data.ID)
+					if err == nil && created {
+						fmt.Println("CREATED OK. ID: ", data.ID)
+					} else if err == nil {
+						fmt.Println("UPDATED OK. ID: ", data.ID)
 					}
 
 					return err

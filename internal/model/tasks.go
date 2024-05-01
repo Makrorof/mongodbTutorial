@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type CreateTask struct {
 	CreatedAt time.Time `json:"created_at"`
@@ -16,9 +18,14 @@ type UpdateTask struct {
 }
 
 type Task struct {
-	ID        string    `json:"id"`
+	ID        TaskID    `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	Text      string    `json:"text"`
 	Completed bool      `json:"completed"`
+}
+
+type TaskID struct {
+	//ID   string `bson:"id" json:"id"`
+	Text string `bson:"text" json:"text"`
 }

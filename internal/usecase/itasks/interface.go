@@ -8,7 +8,7 @@ import (
 
 type Tasks interface {
 	CreateCustom(ctx context.Context, c *model.CreateTask) (*model.Task, error)
-	Create(ctx context.Context, text string) (*model.Task, error)
+	Create(ctx context.Context, text string) (*model.Task, bool, error)
 	GetAll(ctx context.Context) ([]*model.Task, error)
 	GetPending(ctx context.Context) ([]*model.Task, error)
 	GetFinished(ctx context.Context) ([]*model.Task, error)
