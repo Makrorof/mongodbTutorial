@@ -10,6 +10,7 @@ import (
 	"github.com/Makrorof/mongodbTutorial/internal/repository/task"
 	itask "github.com/Makrorof/mongodbTutorial/internal/usecase/itasks"
 	"github.com/Makrorof/mongodbTutorial/tools"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
 )
@@ -70,4 +71,32 @@ func (t *Tasks) GetAll(ctx context.Context) ([]*model.Task, error) {
 	}
 
 	return mapper.ToTasks(tasks), nil
+}
+
+func (t *Tasks) Update(ctx context.Context, updateTask *model.UpdateTask) error {
+	filter := bson.D{
+		bson.E{
+			Key:   "text",
+			Value: updateTask.FilterText,
+		},
+	}
+
+	update := bson.D{
+		bson.E{
+			Key: "$set",
+			Value: bson.D{
+				bson.E{
+					Key:   "completed",
+					Value: updateTask.Completed,
+				}, bson.E{
+					Key:   "updated_at",
+					Value: time.Now(),
+				},
+			},
+		},
+	}
+
+	_, err := t.repo.FindOneAndUpdate(ctx, filter, update)
+
+	return err
 }

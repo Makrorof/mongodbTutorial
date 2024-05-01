@@ -51,9 +51,9 @@ func RunCLI() {
 				},
 			},
 			{
-				Name:    "gets",
-				Aliases: []string{"g"},
-				Usage:   "Fetch all tasks.",
+				Name:    "all",
+				Aliases: []string{"l"},
+				Usage:   "list all tasks",
 				Action: func(c *cli.Context) error {
 					tasks, err := tasksUsecase.GetAll(context.TODO())
 					if err != nil {
@@ -67,6 +67,19 @@ func RunCLI() {
 
 					printTasks(tasks)
 					return nil
+				},
+			},
+			{
+				Name:    "done",
+				Aliases: []string{"d"},
+				Usage:   "complete a task on the list",
+				Action: func(c *cli.Context) error {
+					text := c.Args().First()
+
+					return tasksUsecase.Update(context.TODO(), &model.UpdateTask{
+						FilterText: text,
+						Completed:  true,
+					})
 				},
 			},
 		},

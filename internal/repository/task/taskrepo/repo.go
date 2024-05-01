@@ -73,3 +73,12 @@ func (r *Task) GetsByFilter(ctx context.Context, filter primitive.D) ([]*entity.
 func (r *Task) GetAll(ctx context.Context) ([]*entity.Task, error) {
 	return r.GetsByFilter(ctx, bson.D{{}})
 }
+
+func (r *Task) FindOneAndUpdate(ctx context.Context, filter primitive.D, update primitive.D) (*entity.Task, error) {
+	t := &entity.Task{}
+	if err := r.collection.FindOneAndUpdate(ctx, filter, update).Decode(t); err != nil {
+		return nil, err
+	}
+
+	return t, nil
+}
