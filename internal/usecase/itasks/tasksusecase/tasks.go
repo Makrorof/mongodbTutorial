@@ -79,6 +79,10 @@ func (t *Tasks) Update(ctx context.Context, updateTask *model.UpdateTask) error 
 			Key:   "text",
 			Value: updateTask.FilterText,
 		},
+		bson.E{
+			Key:   "completed",
+			Value: !updateTask.Completed,
+		},
 	}
 
 	update := bson.D{
