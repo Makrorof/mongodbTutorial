@@ -30,6 +30,19 @@ func RunCLI() {
 	app := &cli.App{
 		Name:  "tasker",
 		Usage: "manage tasks",
+		Action: func(c *cli.Context) error {
+			tasks, err := tasksUsecase.GetPending(context.TODO())
+			if err != nil {
+				if err == mongo.ErrNoDocuments {
+					fmt.Print("Nothing to see here.\nRun `add 'task'` to add a task")
+					return nil
+				}
+				return err
+			}
+
+			printTasks(tasks)
+			return nil
+		},
 		Commands: []cli.Command{
 			{
 				Name:    "add",
@@ -80,6 +93,25 @@ func RunCLI() {
 						FilterText: text,
 						Completed:  true,
 					})
+				},
+			},
+			{
+				Name:    "finished",
+				Aliases: []string{"f"},
+				Usage:   "list completed tasks",
+				Action: func(c *cli.Context) error {
+					tasks, err := tasksUsecase.GetFinished(context.TODO())
+					if err != nil {
+						if err == mongo.ErrNoDocuments {
+							fmt.Print("Nothing to see here.\nRun `done 'task'` to complete a task")
+							return nil
+						}
+
+						return err
+					}
+
+					printTasks(tasks)
+					return nil
 				},
 			},
 		},

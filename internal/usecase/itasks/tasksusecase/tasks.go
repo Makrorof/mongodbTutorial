@@ -100,3 +100,32 @@ func (t *Tasks) Update(ctx context.Context, updateTask *model.UpdateTask) error 
 
 	return err
 }
+
+func (t *Tasks) GetPending(ctx context.Context) ([]*model.Task, error) {
+	filter := bson.D{
+		bson.E{
+			Key:   "completed",
+			Value: false,
+		},
+	}
+
+	list, err := t.repo.GetsByFilter(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	return mapper.ToTasks(list), nil
+}
+func (t *Tasks) GetFinished(ctx context.Context) ([]*model.Task, error) {
+	filter := bson.D{
+		bson.E{
+			Key:   "completed",
+			Value: true,
+		},
+	}
+
+	list, err := t.repo.GetsByFilter(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	return mapper.ToTasks(list), nil
+}
