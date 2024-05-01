@@ -80,8 +80,10 @@ func (t *Tasks) GetAll(ctx context.Context) ([]*model.Task, error) {
 func (t *Tasks) Update(ctx context.Context, updateTask *model.UpdateTask) error {
 	filter := bson.D{
 		bson.E{
-			Key:   "text",
-			Value: updateTask.FilterText,
+			Key: "_id",
+			Value: bson.M{
+				"text": updateTask.FilterText,
+			},
 		},
 		bson.E{
 			Key:   "completed",
