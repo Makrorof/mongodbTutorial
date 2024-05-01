@@ -41,3 +41,29 @@ func (r *Task) Create(ctx context.Context, task *entity.Task) (*entity.Task, err
 
 	return task, nil
 }
+
+func (r *Task) GetsByFilter(ctx context.Context, filter primitive.D) ([]*entity.Task, error) {
+	tasks := make([]*entity.Task, 0)
+
+	zap.L().Info("A request to retrieve tasks based on a filter has been received.")
+
+	cur, err := r.collection.Find(ctx, filter)
+	if err != nil {
+		zap.L().Error("There was an issue while fetching the tasks.", zap.Error(err))
+		return tasks, err
+	}
+
+	for cur.Next(ctx) {
+		var t *entity.Task
+		err := cur.Decode(t)
+		if err != nil {
+			zap.L().Error("There was an issue while fetching the tasks.", zap.Error(err))
+			return tasks, err
+		}
+
+		tasks = append(tasks, t)
+	}
+	zap.L().Info("The tasks were successfully fetched.", zap.Int("len", len(tasks)))
+
+	return tasks, nil
+}
