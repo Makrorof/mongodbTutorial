@@ -9,11 +9,14 @@ require (
 	github.com/lestrrat/go-strftime v0.0.0-20180220042222-ba3bf9c1d042 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
 )
 
 require (
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/gookit/color v1.5.4
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect

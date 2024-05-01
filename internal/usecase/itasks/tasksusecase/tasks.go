@@ -61,3 +61,13 @@ func (t *Tasks) Create(ctx context.Context, text string) (*model.Task, error) {
 
 	return mapper.ToTask(task), nil
 }
+
+func (t *Tasks) GetAll(ctx context.Context) ([]*model.Task, error) {
+	tasks, err := t.repo.GetAll(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.ToTasks(tasks), nil
+}

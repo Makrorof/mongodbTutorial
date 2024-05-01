@@ -6,6 +6,7 @@ import (
 	"github.com/Makrorof/mongodbTutorial/internal/entity"
 	"github.com/Makrorof/mongodbTutorial/internal/repository/task"
 	"github.com/Makrorof/mongodbTutorial/tools"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
@@ -49,21 +50,26 @@ func (r *Task) GetsByFilter(ctx context.Context, filter primitive.D) ([]*entity.
 
 	cur, err := r.collection.Find(ctx, filter)
 	if err != nil {
-		zap.L().Error("There was an issue while fetching the tasks.", zap.Error(err))
+		zap.L().Error("There was an issue while fetching the tasks. [get cursor]", zap.Error(err))
 		return tasks, err
 	}
 
 	for cur.Next(ctx) {
-		var t *entity.Task
-		err := cur.Decode(t)
+		var t entity.Task // =new //hata verirse gereksiz olusturma olur
+		err := cur.Decode(&t)
 		if err != nil {
 			zap.L().Error("There was an issue while fetching the tasks.", zap.Error(err))
 			return tasks, err
 		}
 
-		tasks = append(tasks, t)
+		tasks = append(tasks, &t)
 	}
+
 	zap.L().Info("The tasks were successfully fetched.", zap.Int("len", len(tasks)))
 
 	return tasks, nil
+}
+
+func (r *Task) GetAll(ctx context.Context) ([]*entity.Task, error) {
+	return r.GetsByFilter(ctx, bson.D{{}})
 }
