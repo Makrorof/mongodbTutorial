@@ -18,10 +18,21 @@ type Task struct {
 	collection *mongo.Collection
 }
 
-func New(collection *mongo.Collection) task.TaskRepo {
+func New(collection *mongo.Collection) (task.TaskRepo, error) {
+	// db.members.createIndex( { "SOME_FIELD": 1 }, { unique: true } )
+	mod := mongo.IndexModel{
+		Keys: bson.M{
+			"completed": 1, // index in ascending order
+		}, Options: nil,
+	}
+
+	if _, err := collection.Indexes().CreateOne(context.TODO(), mod); err != nil {
+		return nil, err
+	}
+
 	return &Task{
 		collection: collection,
-	}
+	}, nil
 }
 
 func (r *Task) Create(ctx context.Context, task *entity.Task) (*entity.Task, error) {

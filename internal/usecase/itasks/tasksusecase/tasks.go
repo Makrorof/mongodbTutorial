@@ -11,6 +11,7 @@ import (
 	itask "github.com/Makrorof/mongodbTutorial/internal/usecase/itasks"
 	"github.com/Makrorof/mongodbTutorial/tools"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
 )
 
@@ -97,7 +98,7 @@ func (t *Tasks) Update(ctx context.Context, updateTask *model.UpdateTask) error 
 				},
 				bson.E{
 					Key:   "updated_at",
-					Value: time.Now(),
+					Value: primitive.Timestamp{T: uint32(time.Now().Unix())},
 				},
 			},
 		},

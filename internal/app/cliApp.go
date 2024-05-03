@@ -24,7 +24,12 @@ func RunCLI() {
 		return
 	}
 
-	taskRepo := taskrepo.New(collection)
+	taskRepo, err := taskrepo.New(collection)
+	if err != nil {
+		zap.L().Panic("Couldn't connect to the database.", zap.Error(err))
+		return
+	}
+
 	tasksUsecase := tasksusecase.New(taskRepo)
 
 	app := &cli.App{
