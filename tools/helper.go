@@ -29,7 +29,7 @@ func SetupMongo(host string, port string) (*mongo.Collection, error) {
 
 func SetupLog(level zapcore.Level, path string, maxAge time.Duration, rotationTime time.Duration, devMode bool) {
 	// initialize the rotator
-	logFile := path + "/asininflux-%Y-%m-%d-%H-%M-%S.log"
+	logFile := path + "/app-%Y-%m-%d-%H-%M-%S.log"
 	rotator, err := rotatelogs.New(
 		logFile,
 		rotatelogs.WithMaxAge(maxAge),
