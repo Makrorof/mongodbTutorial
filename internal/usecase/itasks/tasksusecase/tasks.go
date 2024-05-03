@@ -30,8 +30,6 @@ func (t *Tasks) CreateCustom(ctx context.Context, c *model.CreateTask) (*model.T
 			//ID:   primitive.NewObjectID(),
 			Text: c.Text,
 		},
-		CreatedAt: c.CreatedAt,
-		UpdatedAt: c.UpdatedAt,
 		Completed: c.Completed,
 	}
 
@@ -52,8 +50,6 @@ func (t *Tasks) Create(ctx context.Context, text string) (*model.Task, bool, err
 			//ID:   primitive.NewObjectID(),
 			Text: text,
 		},
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 		Completed: false,
 	}
 
@@ -98,7 +94,8 @@ func (t *Tasks) Update(ctx context.Context, updateTask *model.UpdateTask) error 
 				bson.E{
 					Key:   "completed",
 					Value: updateTask.Completed,
-				}, bson.E{
+				},
+				bson.E{
 					Key:   "updated_at",
 					Value: time.Now(),
 				},

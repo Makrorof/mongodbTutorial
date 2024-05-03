@@ -2,6 +2,7 @@ package taskrepo
 
 import (
 	"context"
+	"time"
 
 	"github.com/Makrorof/mongodbTutorial/internal/entity"
 	"github.com/Makrorof/mongodbTutorial/internal/repository/task"
@@ -30,6 +31,9 @@ func (r *Task) Create(ctx context.Context, task *entity.Task) (*entity.Task, err
 	//	zap.L().Info("A new ID has been assigned because the task's ID was empty.", zap.String("new_id", task.ID.ID.String()), zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
 	//}
 
+	task.CreatedAt = primitive.Timestamp{T: uint32(time.Now().Unix())}
+	task.UpdatedAt = primitive.Timestamp{T: uint32(time.Now().Unix())}
+
 	zap.L().Info("Received a request to create a task.", zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
 
 	result, err := r.collection.InsertOne(ctx, task)
@@ -51,6 +55,9 @@ func (r *Task) CreateOrUpdate(ctx context.Context, task *entity.Task) (*entity.T
 	//	zap.L().Info("A new ID has been assigned because the task's ID was empty.", zap.String("new_id", task.ID.ID.String()), zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
 	//}
 
+	task.CreatedAt = primitive.Timestamp{T: uint32(time.Now().Unix())}
+	task.UpdatedAt = primitive.Timestamp{T: uint32(time.Now().Unix())}
+
 	zap.L().Info("Received a request to create a task.", zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
 
 	filter := bson.M{
@@ -62,15 +69,21 @@ func (r *Task) CreateOrUpdate(ctx context.Context, task *entity.Task) (*entity.T
 			Key: "$set",
 			Value: bson.D{
 				bson.E{
-					Key:   "created_at",
-					Value: task.CreatedAt,
-				}, bson.E{
 					Key:   "updated_at",
 					Value: task.UpdatedAt,
 				},
 				bson.E{
 					Key:   "completed",
 					Value: task.Completed,
+				},
+			},
+		},
+		bson.E{
+			Key: "$setOnInsert",
+			Value: bson.D{
+				bson.E{
+					Key:   "created_at",
+					Value: task.CreatedAt,
 				},
 			},
 		},

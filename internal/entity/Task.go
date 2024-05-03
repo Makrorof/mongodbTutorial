@@ -2,17 +2,17 @@ package entity
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/Makrorof/mongodbTutorial/tools"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Task struct {
-	ID        TaskID    `bson:"_id"`
-	CreatedAt time.Time `bson:"created_at"`
-	UpdatedAt time.Time `bson:"updated_at"`
-	Completed bool      `bson:"completed"`
+	ID        TaskID              `bson:"_id"`
+	CreatedAt primitive.Timestamp `bson:"created_at"`
+	UpdatedAt primitive.Timestamp `bson:"updated_at"`
+	Completed bool                `bson:"completed"`
 }
 
 type TaskID struct {
