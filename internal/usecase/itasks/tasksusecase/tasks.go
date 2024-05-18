@@ -25,6 +25,36 @@ func New(repo task.TaskRepo) itask.Tasks {
 	}
 }
 
+// CreateJob implements itasks.Tasks.
+func (t *Tasks) CreateJob(ctx context.Context, c *model.CreateTaskJob) (*model.Task, bool, error) {
+	jobs := make([]entity.Job, len(c.Jobs))
+
+	for i, j := range c.Jobs {
+		jobs[i] = entity.Job{
+			Name: j.Name,
+			Job:  j.Job,
+		}
+	}
+
+	et := &entity.Task{
+		ID: entity.TaskID{
+			//ID:   primitive.NewObjectID(),
+			Text: c.Text,
+		},
+		Completed: c.Completed,
+		Jobs:      jobs,
+	}
+
+	zap.L().Info("A custom task creation request has been received in the use case, and a new ID has been assigned.", zap.String("new_id", et.ID.String()), zap.String("task.text[:30]", tools.StrLimit(c.Text, 30)))
+
+	task, created, err := t.repo.AddJobs(ctx, et)
+	if err != nil {
+		return nil, false, err
+	}
+
+	return mapper.ToTask(task), created, nil
+}
+
 func (t *Tasks) CreateCustom(ctx context.Context, c *model.CreateTask) (*model.Task, error) {
 	et := &entity.Task{
 		ID: entity.TaskID{

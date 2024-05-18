@@ -14,4 +14,5 @@ type TaskRepo interface {
 	GetsByFilter(ctx context.Context, filter primitive.D) ([]*entity.Task, error)
 	GetAll(ctx context.Context) ([]*entity.Task, error)
 	FindOneAndUpdate(ctx context.Context, filter primitive.D, update primitive.D) (*entity.Task, error)
+	AddJobs(ctx context.Context, task *entity.Task) (*entity.Task, bool, error)
 }

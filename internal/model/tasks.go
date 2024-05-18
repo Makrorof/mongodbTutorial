@@ -9,6 +9,20 @@ type CreateTask struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	Text      string    `json:"text"`
 	Completed bool      `json:"completed"`
+	Jobs      []Job     `json:"jobs"`
+}
+
+type Job struct {
+	Name string `json:"name"`
+	Job  string `json:"job"`
+}
+
+type CreateTaskJob struct {
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Text      string    `json:"text"`
+	Completed bool      `json:"completed"`
+	Jobs      []Job     `json:"jobs"`
 }
 
 type UpdateTask struct {

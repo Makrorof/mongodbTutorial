@@ -50,6 +50,47 @@ func RunCLI() {
 		},
 		Commands: []cli.Command{
 			{
+				Name:    "addJob",
+				Aliases: []string{"job"},
+				Usage:   "add a task to the list",
+				Action: func(c *cli.Context) error {
+					str := c.Args().First()
+					if str == "" {
+						return errors.New("cannot add an empty task")
+					}
+
+					//for _, arg := range c.Args() {
+					//	fmt.Println("Inputs: ", arg)
+					//}
+
+					if (c.NArg()-1)%2 != 0 || c.NArg() <= 1 {
+						return errors.New("wrong args")
+					}
+
+					jobs := make([]model.Job, 0, (c.NArg()-1)/2)
+
+					for i := 1; i < c.NArg(); i += 2 {
+						jobs = append(jobs, model.Job{
+							Name: c.Args()[i],
+							Job:  c.Args()[i+1],
+						})
+					}
+
+					data, created, err := tasksUsecase.CreateJob(context.TODO(), &model.CreateTaskJob{
+						Text: str,
+						Jobs: jobs,
+					})
+
+					if err == nil && created {
+						fmt.Println("CREATED OK. ID: ", data.ID)
+					} else if err == nil {
+						fmt.Println("UPDATED OK. ID: ", data.ID)
+					}
+
+					return err
+				},
+			},
+			{
 				Name:    "add",
 				Aliases: []string{"a"},
 				Usage:   "add a task to the list",

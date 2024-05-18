@@ -153,3 +153,63 @@ func (r *Task) FindOneAndUpdate(ctx context.Context, filter primitive.D, update 
 
 	return t, nil
 }
+
+func (r *Task) AddJobs(ctx context.Context, task *entity.Task) (*entity.Task, bool, error) {
+	task.CreatedAt = primitive.Timestamp{T: uint32(time.Now().Unix())}
+	task.UpdatedAt = primitive.Timestamp{T: uint32(time.Now().Unix())}
+
+	zap.L().Info("Received a request to create a task.", zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
+
+	filter := bson.M{
+		"_id": task.ID,
+	}
+
+	update := bson.D{
+		bson.E{
+			Key: "$set",
+			Value: bson.D{
+				bson.E{
+					Key:   "updated_at",
+					Value: task.UpdatedAt,
+				},
+				bson.E{
+					Key:   "completed",
+					Value: task.Completed,
+				},
+			},
+		},
+		bson.E{
+			Key: "$setOnInsert",
+			Value: bson.D{
+				bson.E{
+					Key:   "created_at",
+					Value: task.CreatedAt,
+				},
+			},
+		},
+		bson.E{
+			Key: "$push",
+			Value: bson.D{
+				bson.E{
+					Key: "jobs",
+					Value: bson.M{
+						"$each": task.Jobs,
+					},
+				},
+			},
+		},
+	}
+
+	result, err := r.collection.UpdateOne(ctx, filter, update, options.Update().SetUpsert(true))
+
+	//result, err := r.collection.InsertOne(ctx, task)
+
+	if err != nil {
+		zap.L().Error("The task creation could not be completed.", zap.Error(err), zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
+		return nil, false, err
+	}
+
+	zap.L().Info("The task creation has been completed.", zap.String("id", task.ID.String()), zap.String("insert_id", entity.ParseTaskID(result.UpsertedID).String()), zap.String("task.text[:30]", tools.StrLimit(task.ID.Text, 30)))
+
+	return task, result.UpsertedCount > 0, nil
+}

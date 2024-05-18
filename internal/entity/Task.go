@@ -8,8 +8,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type Job struct {
+	Name string `bson:"name"`
+	Job  string `bson:"job"`
+}
+
 type Task struct {
 	ID        TaskID              `bson:"_id"`
+	Jobs      []Job               `bson:"jobs"`
 	CreatedAt primitive.Timestamp `bson:"created_at"`
 	UpdatedAt primitive.Timestamp `bson:"updated_at"`
 	Completed bool                `bson:"completed"`
